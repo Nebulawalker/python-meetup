@@ -92,3 +92,34 @@ class Issue(models.Model):
 
     def __str__(self):
         return self.question
+
+
+class ChatState(models.Model):
+
+    chat_id = models.IntegerField(
+        'идентификатор чата',
+        primary_key=True,
+    )
+    state = models.CharField(
+        'состояние',
+        max_length=100,
+    )
+
+    created_at = models.DateTimeField(
+        verbose_name='создан в',
+        auto_now_add=True,
+        db_index=True,
+    )
+
+    modified_at = models.DateTimeField(
+        verbose_name='изменен в',
+        auto_now=True,
+        db_index=True,
+    )
+
+    class Meta:
+        verbose_name = 'состояние чата'
+        verbose_name_plural = 'состояния чатов'
+
+    def __str__(self):
+        return f'Состояние чата {self.chat_id}: {self.state}'
