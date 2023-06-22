@@ -5,6 +5,7 @@ from loader import dp
 from tg_bot.states.states import UserState
 from tg_bot.utils.db_cruds import get_report
 from tg_bot.keyboards import inline_kb
+from tg_bot.messages.messages import get_report_description
 
 
 @dp.callback_query_handler(
@@ -12,17 +13,16 @@ from tg_bot.keyboards import inline_kb
         state=UserState.report
 )
 async def manage_report(callback_query: types.CallbackQuery, state: FSMContext):
+    await callback_query.message.edit_reply_markup()
     report_id = int(callback_query.data[1:])
     report = await get_report(report_id)
+    await callback_query.message.answer(
+            await get_report_description(report),
+            reply_markup=inline_kb.base_menu)
     if report['is_current']:
-        await callback_query.message.answer(
-            f'Доклад сейчас идёт\nТема: {report["topic"]},\nДокладчик: {report["speaker"]},\n'
-            f'Начало: {report["starts_at"]},\nКонец: {report["ends_at"]}',
-            reply_markup=inline_kb.base_menu
-        )
-    else:
-        await callback_query.message.answer(
-            f'Тема: {report["topic"]},\nДокладчик: {report["speaker"]},\nНачало: {report["starts_at"]},'
-            f'\nКонец: {report["ends_at"]}', reply_markup=inline_kb.base_menu)
+        await callback_query.message.answer('Прямо сейчас идет доклад, Вы можете задать вопрос спикеру!')
+        
+   
     await state.finish()
     await callback_query.answer()
+    

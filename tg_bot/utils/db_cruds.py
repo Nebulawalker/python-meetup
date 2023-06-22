@@ -40,7 +40,7 @@ def get_reports():
     serialized_reports = []
     for report in reports:
         serialized_report = dict(id=report.id, topic=report.topic, speaker=report.speaker, starts_at=report.starts_at,
-                                 ends_at=report.ends_at)
+                                 ends_at=report.ends_at, is_current=report.is_current)
         serialized_reports.append(serialized_report)
     return serialized_reports
 
