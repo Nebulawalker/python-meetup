@@ -14,4 +14,4 @@ class User(AbstractUser):
         verbose_name_plural = 'пользователи'
 
     def __str__(self):
-        return f'{self.username} (tg: {self.tg_id})'
+        return self.username
