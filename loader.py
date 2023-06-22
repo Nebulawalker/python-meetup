@@ -3,27 +3,17 @@ import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "python_meetup.settings")
 django.setup()
-from aiogram import Bot, Dispatcher, types
 from django.conf import settings
-from aiogram.dispatcher.filters.state import StatesGroup, State
+from aiogram import Bot, Dispatcher, types
+from aiogram.utils import executor
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
+from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-
-# from python_meetup import settings
-import dotenv
-
-from asgiref.sync import sync_to_async
 import funcs
-from pathlib import Path
-from aiogram.utils import executor
 import markups as m
+from asgiref.sync import sync_to_async
 
-# from aiogram.contrib.fsm_storage.memory import MemoryStorage
-# BASE_DIR = Path(__file__).resolve().parent
-# dotenv.load_dotenv(Path(BASE_DIR, '.env'))
-# token = os.environ['TELEGRAM_BOT_TOKEN']
-# bot = Bot(token=token)
 bot = Bot(settings.TELEGRAM_BOT_TOKEN, parse_mode=types.ParseMode.HTML)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
@@ -39,7 +29,7 @@ async def exit_proceed(msg: types.Message, state: FSMContext):
     await state.finish()
 
 
-@dp.message_handler()
+@dp.message_handler(state=[UserState, None])
 async def start_conversation(msg: types.Message):
     status = await sync_to_async(funcs.identify_user)(msg.from_user.id)
     if status == 'hearer':
@@ -53,12 +43,9 @@ async def start_conversation(msg: types.Message):
                          reply_markup=m.base_menu)
         await msg.answer('Сделайте выбор', reply_markup=m.reporter_main_menu)
 
-    print(msg.from_user.id)
-    print(status)
-
 
 @dp.callback_query_handler(Text('reports'), state=[UserState, None])
-async def intro(cb: types.CallbackQuery, state: FSMContext):
+async def intro(cb: types.CallbackQuery):
     reports = await sync_to_async(funcs.get_reports)()
     if reports:
         reports_markup = types.InlineKeyboardMarkup(row_width=1)
@@ -72,18 +59,25 @@ async def intro(cb: types.CallbackQuery, state: FSMContext):
         await UserState.report.set()
         await cb.answer()
 
+
 @dp.callback_query_handler(lambda cb: cb.data[0] == '/', state=UserState.report)
 async def manage_report(cb: types.CallbackQuery, state: FSMContext):
     report_id = int(cb.data[1:])
     report = await sync_to_async(funcs.get_report)(report_id)
-    await cb.message.answer(f'Тема: {report["topic"]},\nДокладчик: {report["speaker"]},\nНачало: {report["starts_at"]},'
-                            f'\nКонец: {report["ends_at"]}', reply_markup=m.base_menu)
+    if report['is_current']:
+        await cb.message.answer(f'Доклад сейчас идёт\nТема: {report["topic"]},\nДокладчик: {report["speaker"]},\n'
+                                f'Начало: {report["starts_at"]},\nКонец: {report["ends_at"]}', reply_markup=m.base_menu)
+    else:
+        await cb.message.answer(
+            f'Тема: {report["topic"]},\nДокладчик: {report["speaker"]},\nНачало: {report["starts_at"]},'
+            f'\nКонец: {report["ends_at"]}', reply_markup=m.base_menu)
+    await state.finish()
     await cb.answer()
 
 
 # hearer block start====================================================================================================
 @dp.callback_query_handler(Text('intro'), state=[UserState, None])
-async def intro(cb: types.CallbackQuery, state: FSMContext):
+async def intro(cb: types.CallbackQuery):
     await bot.send_document(chat_id=cb.from_user.id, document=open('intro'),
                             reply_markup=m.hearer_main_menu)
     await cb.answer()
