@@ -3,6 +3,7 @@ from users.models import User
 from tg_bot.models import Survey, Report
 from django.db.utils import IntegrityError
 
+
 from asgiref.sync import sync_to_async
 
 
@@ -37,16 +38,22 @@ def is_user_reporter(tg_id):
 @sync_to_async
 def get_reports():
     reports = Report.objects.all().order_by('ends_at')
-    serialized_reports = []
-    for report in reports:
-        serialized_report = dict(id=report.id, topic=report.topic, speaker=report.speaker, starts_at=report.starts_at,
-                                 ends_at=report.ends_at)
-        serialized_reports.append(serialized_report)
-    return serialized_reports
+    if reports:
+        serialized_reports = []
+        for report in reports:
+            serialized_report = dict(id=report.id, topic=report.topic, speaker=report.speaker, starts_at=report.starts_at,
+                                     ends_at=report.ends_at)
+            serialized_reports.append(serialized_report)
+        return serialized_reports
+    else:
+        return False
 
 @sync_to_async
 def get_report(report_id):
     report = Report.objects.get(id=report_id)
-    serialized_report = dict(id=report.id, topic=report.topic, speaker=report.speaker, starts_at=report.starts_at,
-                             ends_at=report.ends_at, is_current=report.is_current)
-    return serialized_report
+    if report:
+        serialized_report = dict(id=report.id, topic=report.topic, speaker=report.speaker, starts_at=report.starts_at,
+                                 ends_at=report.ends_at, is_current=report.is_current)
+        return serialized_report
+    else:
+        return 'доклад отсутствует'

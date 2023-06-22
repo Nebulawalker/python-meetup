@@ -1,4 +1,9 @@
 from aiogram import Bot, Dispatcher, types
+import os
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "python_meetup.settings")
+django.setup()
 from django.conf import settings
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 

@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.dispatcher.filters import Text
 from loader import dp
-
+from tg_bot.keyboards import inline_kb
 from tg_bot.states.states import UserState, SurveyState
 from tg_bot.utils.db_cruds import get_reports
 
@@ -10,6 +10,7 @@ from tg_bot.utils.db_cruds import get_reports
 @dp.callback_query_handler(Text('reports'), state=[UserState, SurveyState, None])
 async def show_reports(callback_query: types.CallbackQuery):
     reports = await get_reports()
+    print(reports)
     if reports:
         reports_markup = types.InlineKeyboardMarkup(row_width=1)
         reports_btn = []
@@ -22,5 +23,10 @@ async def show_reports(callback_query: types.CallbackQuery):
             f'Выберите доклад',
             reply_markup=reports_markup
         )
-        await UserState.report.set()
-        await callback_query.answer()
+    else:
+        await callback_query.message.answer(
+            f'на данный момент докладов нет',
+            reply_markup=inline_kb.hearer_main_menu
+        )
+    await UserState.report.set()
+    await callback_query.answer()
