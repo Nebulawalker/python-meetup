@@ -1,1 +1,1 @@
-# Тут писать сообщения
+ABOUT_MSG = 'Тут будет информация о нас. tg_bot/messages.py var ABOUT_MSG'
