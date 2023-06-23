@@ -20,15 +20,14 @@ async def form(message: types.Message):
             f'Ваша анкета зарегистрирована:\nпользователь: {survey["user"]}\nимя: {survey["first_name"]}\nфамилия: {survey["last_name"]}\nдата рождения: {survey["birth_date"]}\n'
             f'специальность: {survey["specialization"]}\nстек: {survey["stack"]}\nхобби: {survey["hobby"]}\n'
             f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}',
-            reply_markup=inline_kb.hearer_main_menu)
+            reply_markup=inline_kb.base_menu)
     else:
-        # await create_user(username, tg_id)
         await message.answer(
             f'Введите дату рождения в формате "гггг-мм-дд":')
         await SurveyState.birthdate.set()
 
 
-@dp.message_handler(lambda msg: msg.text != 'exit', state=SurveyState.birthdate)
+@dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.birthdate)
 async def birthdate(message: types.Message, state: FSMContext):
     try:
         birth = date.fromisoformat(message.text)
@@ -39,7 +38,7 @@ async def birthdate(message: types.Message, state: FSMContext):
     await SurveyState.first_name.set()
 
 
-@dp.message_handler(lambda msg: msg.text != 'exit', state=SurveyState.first_name)
+@dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.first_name)
 async def specialization(message: types.Message, state: FSMContext):
     first_name = message.text
     await state.update_data(first_name=first_name)
@@ -47,7 +46,7 @@ async def specialization(message: types.Message, state: FSMContext):
     await SurveyState.last_name .set()
 
 
-@dp.message_handler(lambda msg: msg.text != 'exit', state=SurveyState.last_name )
+@dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.last_name )
 async def specialization(message: types.Message, state: FSMContext):
     last_name = message.text
     await state.update_data(last_name=last_name)
@@ -56,7 +55,7 @@ async def specialization(message: types.Message, state: FSMContext):
 
 
 
-@dp.message_handler(lambda msg: msg.text != 'exit', state=SurveyState.specialization)
+@dp.message_handler(lambda msg: msg.text  not in ['exit', '/start'], state=SurveyState.specialization)
 async def specialization(message: types.Message, state: FSMContext):
     specialization = message.text
     await state.update_data(specialization=specialization)
@@ -64,7 +63,7 @@ async def specialization(message: types.Message, state: FSMContext):
     await SurveyState.stack.set()
 
 
-@dp.message_handler(lambda msg: msg.text != 'exit', state=SurveyState.stack)
+@dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.stack)
 async def stack(message: types.Message, state: FSMContext):
     stack = message.text
     await state.update_data(stack=stack)
@@ -72,7 +71,7 @@ async def stack(message: types.Message, state: FSMContext):
     await SurveyState.hobby.set()
 
 
-@dp.message_handler(lambda msg: msg.text != 'exit', state=SurveyState.hobby)
+@dp.message_handler(lambda msg: msg.text  not in ['exit', '/start'], state=SurveyState.hobby)
 async def hobby(message: types.Message, state: FSMContext):
     hobby = message.text
     await state.update_data(hobby=hobby)
@@ -80,7 +79,7 @@ async def hobby(message: types.Message, state: FSMContext):
     await SurveyState.goal.set()
 
 
-@dp.message_handler(lambda msg: msg.text != 'exit', state=SurveyState.goal)
+@dp.message_handler(lambda msg: msg.text  not in ['exit', '/start'], state=SurveyState.goal)
 async def goal(message: types.Message, state: FSMContext):
     acquaintance_goal = message.text
     await state.update_data(acquaintance_goal=acquaintance_goal)
@@ -88,7 +87,7 @@ async def goal(message: types.Message, state: FSMContext):
     await SurveyState.region.set()
 
 
-@dp.message_handler(lambda msg: msg.text != 'exit', state=SurveyState.region)
+@dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.region)
 async def proceed_data_for_survey(message: types.Message, state: FSMContext):
     region = message.text
     username = message.from_user.username
@@ -100,5 +99,5 @@ async def proceed_data_for_survey(message: types.Message, state: FSMContext):
     survey = await get_survey(username=message.from_user.username)
     await message.answer(f'Ваша анкета зарегистрирована:\nпользователь: {survey["user"]}\nимя: {survey["first_name"]}\nфамилия: {survey["last_name"]}\nдата рождения: {survey["birth_date"]}\n'
             f'специальность: {survey["specialization"]}\nстек: {survey["stack"]}\nхобби: {survey["hobby"]}\n'
-            f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}', reply_markup=inline_kb.hearer_main_menu)
+            f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}', reply_markup=inline_kb.base_menu)
     await state.finish()

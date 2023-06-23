@@ -1,8 +1,8 @@
 from aiogram import types
 
-base_menu = types.InlineKeyboardMarkup(row_width=2)
+base_menu = types.InlineKeyboardMarkup(row_width=3)
 base_menu_buttons = [
-    types.InlineKeyboardButton('О нас', callback_data='intro'),
+    types.InlineKeyboardButton('Начать', callback_data='start'),
     types.InlineKeyboardButton('участники', callback_data='members'),
     types.InlineKeyboardButton('доклады', callback_data='reports'),
 ]

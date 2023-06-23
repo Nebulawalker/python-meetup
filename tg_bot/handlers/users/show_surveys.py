@@ -10,6 +10,7 @@ from aiogram.dispatcher import FSMContext
 
 @dp.callback_query_handler(Text('members'), state=[UserState, SurveyState, None])
 async def show_surveys(cb: types.CallbackQuery):
+    await cb.message.edit_reply_markup()
     surveys= await get_surveys()
     if surveys:
         surveys_markup = types.InlineKeyboardMarkup(row_width=1)
