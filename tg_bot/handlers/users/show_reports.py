@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.dispatcher.filters import Text
 from loader import dp
-
+from tg_bot.keyboards import inline_kb
 from tg_bot.states.states import UserState, SurveyState
 from tg_bot.utils.db_cruds import get_reports
 from tg_bot.messages.messages import get_report_button_caption
@@ -24,5 +24,9 @@ async def show_reports(callback_query: types.CallbackQuery):
             reply_markup=reports_markup
         )
         await UserState.report.set()
-        await callback_query.answer()
-        
+    else:
+        await callback_query.message.answer(
+            'На данный момент докладов нет',
+            reply_markup=inline_kb.base_menu
+        )
+    await callback_query.answer()

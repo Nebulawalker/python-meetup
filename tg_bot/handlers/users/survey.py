@@ -1,6 +1,6 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text
+from aiogram.dispatcher.filters import Text, Command
 from loader import dp
 from tg_bot.keyboards import inline_kb
 
@@ -10,23 +10,22 @@ from tg_bot.states.states import UserState, SurveyState
 from tg_bot.utils.db_cruds import create_survey, create_user, get_survey
 
 
-@dp.callback_query_handler(Text('form'), state=[UserState, SurveyState, None])
-async def form(callback_query: types.CallbackQuery):
-    username = callback_query.from_user.username
-    tg_id = callback_query.from_user.id
+@dp.message_handler(Command('survey'), state=[UserState, SurveyState, None])
+async def form(message: types.Message):
+    username = message.from_user.username
+    tg_id = message.from_user.id
     survey = await get_survey(username=username)
     if survey:
-        await callback_query.message.answer(
-            f'У Вас есть анкета:\n пользователь: {survey["user"]}\nдата рождения: {survey["birth_date"]}\n'
+        await message.answer(
+            f'Ваша анкета зарегистрирована:\nпользователь: {survey["user"]}\nимя: {survey["first_name"]}\nфамилия: {survey["last_name"]}\nдата рождения: {survey["birth_date"]}\n'
             f'специальность: {survey["specialization"]}\nстек: {survey["stack"]}\nхобби: {survey["hobby"]}\n'
             f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}',
             reply_markup=inline_kb.hearer_main_menu)
     else:
-        await create_user(username, tg_id)
-        await callback_query.message.answer(
+        # await create_user(username, tg_id)
+        await message.answer(
             f'Введите дату рождения в формате "гггг-мм-дд":')
         await SurveyState.birthdate.set()
-    await callback_query.answer()
 
 
 @dp.message_handler(lambda msg: msg.text != 'exit', state=SurveyState.birthdate)
@@ -34,10 +33,27 @@ async def birthdate(message: types.Message, state: FSMContext):
     try:
         birth = date.fromisoformat(message.text)
         await state.update_data(birth_date=birth)
-        await message.answer('Введите Вашу специализацию:')
+        await message.answer('Введите Ваше имя:')
     except ValueError:
         await message.answer('Неверный ввод, побробуйте еще')
+    await SurveyState.first_name.set()
+
+
+@dp.message_handler(lambda msg: msg.text != 'exit', state=SurveyState.first_name)
+async def specialization(message: types.Message, state: FSMContext):
+    first_name = message.text
+    await state.update_data(first_name=first_name)
+    await message.answer('Введите Вашу фамилию:')
+    await SurveyState.last_name .set()
+
+
+@dp.message_handler(lambda msg: msg.text != 'exit', state=SurveyState.last_name )
+async def specialization(message: types.Message, state: FSMContext):
+    last_name = message.text
+    await state.update_data(last_name=last_name)
+    await message.answer('Введите Вашу специализацию:')
     await SurveyState.specialization.set()
+
 
 
 @dp.message_handler(lambda msg: msg.text != 'exit', state=SurveyState.specialization)
@@ -76,13 +92,13 @@ async def goal(message: types.Message, state: FSMContext):
 async def proceed_data_for_survey(message: types.Message, state: FSMContext):
     region = message.text
     username = message.from_user.username
+    tg_id = message.from_user.id
     await state.update_data(region=region)
     survey_data = await state.get_data()
-    print(survey_data)
-    print(username)
+    await create_user(username=username, tg_id=tg_id, first_name=survey_data['first_name'], last_name=survey_data['last_name'])
     await create_survey(username, **survey_data)
     survey = await get_survey(username=message.from_user.username)
-    await message.answer(f'Ваша анкета зарегистрирована:\nпользователь: {survey["user"]}\nдата рождения: {survey["birth_date"]}\n'
+    await message.answer(f'Ваша анкета зарегистрирована:\nпользователь: {survey["user"]}\nимя: {survey["first_name"]}\nфамилия: {survey["last_name"]}\nдата рождения: {survey["birth_date"]}\n'
             f'специальность: {survey["specialization"]}\nстек: {survey["stack"]}\nхобби: {survey["hobby"]}\n'
             f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}', reply_markup=inline_kb.hearer_main_menu)
     await state.finish()
