@@ -67,3 +67,8 @@ async def button_start(callback_query: types.CallbackQuery):
         #     'Сделайте выбор',
         #     reply_markup=inline_kb.reporter_main_menu
         # )
+
+
+@dp.message_handler(lambda msg: msg.text[0]!='/' and msg.text!='exit', state=[UserState, None])
+async def start_conversation(message: types.Message):
+    await message.answer('Сделайте выбор', reply_markup=inline_kb.base_menu)

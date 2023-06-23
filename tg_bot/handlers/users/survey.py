@@ -97,9 +97,10 @@ async def proceed_data_for_survey(message: types.Message, state: FSMContext):
     await create_user(username=username, tg_id=tg_id, first_name=survey_data['first_name'], last_name=survey_data['last_name'])
     await create_survey(username, **survey_data)
     survey = await get_survey(username=message.from_user.username)
-    await message.answer(f'Ваша анкета зарегистрирована:\nпользователь: {survey["user"]}\nимя: {survey["first_name"]}\nфамилия: {survey["last_name"]}\nдата рождения: {survey["birth_date"]}\n'
-            f'специальность: {survey["specialization"]}\nстек: {survey["stack"]}\nхобби: {survey["hobby"]}\n'
-            f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}', reply_markup=inline_kb.base_menu)
-    await state.finish()
+    if survey:
+        await message.answer(f'Ваша анкета зарегистрирована:\nпользователь: {survey["user"]}\nимя: {survey["first_name"]}\nфамилия: {survey["last_name"]}\nдата рождения: {survey["birth_date"]}\n'
+                f'специальность: {survey["specialization"]}\nстек: {survey["stack"]}\nхобби: {survey["hobby"]}\n'
+                f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}', reply_markup=inline_kb.base_menu)
+        await state.finish()
 
 

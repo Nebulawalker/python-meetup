@@ -22,10 +22,13 @@ def create_user(**data):
 
 @sync_to_async
 def create_survey(username, **data):
-    user = User.objects.get(username=username)
-    Survey.objects.create(user=user, birth_date=data['birth_date'], specialization=data['specialization'],
-                          stack=data['stack'], hobby=data['hobby'], acquaintance_goal=data['acquaintance_goal'],
-                          region=data['region'])
+    try:
+        user = User.objects.get(username=username)
+        Survey.objects.create(user=user, birth_date=data['birth_date'], specialization=data['specialization'],
+                              stack=data['stack'], hobby=data['hobby'], acquaintance_goal=data['acquaintance_goal'],
+                              region=data['region'])
+    except KeyError:
+        pass
 
 
 @sync_to_async
@@ -62,7 +65,7 @@ def get_report(report_id):
 def get_survey(**data):
     def serialize(survey):
         user = User.objects.get(survey=survey)
-        serialized_survey = dict(id=survey.id, user=survey.user, stack=survey.stack, birth_date=survey.birth_date,
+        serialized_survey = dict(id=survey.id, user=''.join(('@', survey.user.username)), stack=survey.stack, birth_date=survey.birth_date,
                                  specialization=survey.specialization, hobby=survey.hobby, region=survey.region,
                                  acquaintance_goal=survey.acquaintance_goal, first_name=user.first_name,
                                  last_name=user.last_name)
