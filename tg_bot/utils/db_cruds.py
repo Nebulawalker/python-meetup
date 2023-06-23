@@ -50,3 +50,20 @@ def get_report(report_id):
     serialized_report = dict(id=report.id, topic=report.topic, speaker=report.speaker, starts_at=report.starts_at,
                              ends_at=report.ends_at, is_current=report.is_current)
     return serialized_report
+
+def get_survey(**data):
+    def serialize(survey):
+        serialized_survey = dict(id=survey.id, user=survey.user, stack=survey.stack, birth_date=survey.birth_date,
+                                 specialization=survey.specialization, hobby=survey.hobby, region=survey.region,
+                                 acquaintance_goal=survey.acquaintance_goal)
+        return serialized_survey
+    if data.get('survey_id'):
+        survey = Survey.objects.get(id=data['survey_id'])
+        return serialize(survey)
+    elif data.get('username'):
+        try:
+            survey = User.objects.get(username=data['username']).survey
+            return serialize(survey)
+        except User.survey.RelatedObjectDoesNotExist:
+            return False
+    return False
