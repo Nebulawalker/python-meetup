@@ -47,7 +47,7 @@ async def button_start(callback_query: types.CallbackQuery):
     await callback_query.message.edit_reply_markup()
     reporter = await is_user_reporter(callback_query.message.from_user.id)
     if not reporter:
-        await callback_query.message.answer(f'Здравствуйте {callback_query.message.from_user.username}! Приветствуем Вас на мероприятии python-meetup!\n'
+        await callback_query.message.answer(f'Здравствуйте {callback_query.from_user.username}! Приветствуем Вас на мероприятии python-meetup!\n'
             f'Я - Бот-помощник! Могу предоставить информации о нашем мероприятии, помогу задать вопросы спикерам, познакомить с другими участниками!\n'
             f'Что-бы узнать больше нажмите кнопку /help в меню.',
             reply_markup=inline_kb.base_menu
@@ -57,7 +57,7 @@ async def button_start(callback_query: types.CallbackQuery):
         #     reply_markup=inline_kb.hearer_main_menu
         # )
     else:
-        await callback_query.message.answer(f'Здравствуйте {callback_query.message.from_user.username}! Приветствуем Вас на мероприятии python-meetup!\n'
+        await callback_query.message.answer(f'Здравствуйте {callback_query.from_user.username}! Приветствуем Вас на мероприятии python-meetup!\n'
             f'Я - Бот-помощник! Могу предоставить информации о нашем мероприятии, помогу задать вопросы спикерам, познакомить с другими участниками!\n'
             f'Что-бы узнать больше нажмите кнопку /help в меню.',
             reply_markup=inline_kb.base_menu
