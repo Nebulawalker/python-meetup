@@ -3,8 +3,8 @@ from aiogram import types
 base_menu = types.InlineKeyboardMarkup(row_width=3)
 base_menu_buttons = [
     types.InlineKeyboardButton('Начать', callback_data='start'),
-    types.InlineKeyboardButton('участники', callback_data='members'),
-    types.InlineKeyboardButton('доклады', callback_data='reports'),
+    types.InlineKeyboardButton('Анкеты', callback_data='members'),
+    types.InlineKeyboardButton('Доклады', callback_data='reports'),
 ]
 base_menu.add(*base_menu_buttons)
 
