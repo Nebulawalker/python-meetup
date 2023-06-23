@@ -1,6 +1,6 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text, Command
+from aiogram.dispatcher.filters import Command
 from loader import dp
 from tg_bot.keyboards import inline_kb
 
@@ -23,19 +23,9 @@ async def form(message: types.Message):
             reply_markup=inline_kb.base_menu)
     else:
         await message.answer(
-            f'Введите дату рождения в формате "гггг-мм-дд":')
-        await SurveyState.birthdate.set()
+            f'Введите Ваше имя:')
+        await SurveyState.first_name.set()
 
-
-@dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.birthdate)
-async def birthdate(message: types.Message, state: FSMContext):
-    try:
-        birth = date.fromisoformat(message.text)
-        await state.update_data(birth_date=birth)
-        await message.answer('Введите Ваше имя:')
-    except ValueError:
-        await message.answer('Неверный ввод, побробуйте еще')
-    await SurveyState.first_name.set()
 
 
 @dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.first_name)
@@ -88,11 +78,21 @@ async def goal(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.region)
-async def proceed_data_for_survey(message: types.Message, state: FSMContext):
+async def region(message: types.Message, state: FSMContext):
     region = message.text
+    await state.update_data(region=region)
+    await message.answer('Введите дату рождения в формате "гггг-мм-дд')
+    await SurveyState.birthdate.set()
+
+@dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.birthdate)
+async def proceed_data_for_survey(message: types.Message, state: FSMContext):
+    try:
+        birth = date.fromisoformat(message.text)
+        await state.update_data(birth_date=birth)
+    except ValueError:
+        await message.answer('Неверный ввод, побробуйте еще')
     username = message.from_user.username
     tg_id = message.from_user.id
-    await state.update_data(region=region)
     survey_data = await state.get_data()
     await create_user(username=username, tg_id=tg_id, first_name=survey_data['first_name'], last_name=survey_data['last_name'])
     await create_survey(username, **survey_data)
@@ -101,3 +101,5 @@ async def proceed_data_for_survey(message: types.Message, state: FSMContext):
             f'специальность: {survey["specialization"]}\nстек: {survey["stack"]}\nхобби: {survey["hobby"]}\n'
             f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}', reply_markup=inline_kb.base_menu)
     await state.finish()
+
+
