@@ -5,6 +5,7 @@ base_menu_buttons = [
     types.InlineKeyboardButton('Начать', callback_data='start'),
     types.InlineKeyboardButton('Анкеты', callback_data='members'),
     types.InlineKeyboardButton('Доклады', callback_data='reports'),
+    types.InlineKeyboardButton('Отправить донат', callback_data='donate'),
 ]
 base_menu.add(*base_menu_buttons)
 
@@ -20,3 +21,16 @@ answer_menu_buttons = [
     types.InlineKeyboardButton('Ответить на вопрос', callback_data='answer'),
 ]
 answer_menu.add(*answer_menu_buttons)
+
+
+def get_donate_reply_markup():
+    reply_markup = types.InlineKeyboardMarkup(row_width=2)
+    buttons = [
+        types.InlineKeyboardButton('500 руб.', callback_data='50000'),
+        types.InlineKeyboardButton('1000 руб.', callback_data='100000'),
+        types.InlineKeyboardButton('Другая', callback_data='other_amount'),
+        types.InlineKeyboardButton('Отмена', callback_data='cancel_donate'),
+    ]
+    reply_markup.add(*buttons)
+
+    return reply_markup

@@ -121,3 +121,13 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
+PAYMENTS_PROVIDER_TOKEN = env.str('PAYMENTS_PROVIDER_TOKEN')
+INVOICE_IMAGE_URL = env.str(
+    'INVOICE_IMAGE_URL',
+    'https://encrypted-tbn0.gstatic.com/images?q='
+    'tbn:ANd9GcSOIcbg2HX4YzFqzHT5wx8dArN4wL6wut2-'
+    'h010TM7MpO5D7MSZmHMUwILvY52uIF0lNDA&usqp=CAU'
+)
+
+MIN_DONATION_AMOUNT = env.int('MIN_DONATION_AMOUNT', 300)
+MAX_DONATION_AMOUNT = env.int('MAX_DONATION_AMOUNT', 500000)
