@@ -1,6 +1,5 @@
-from loguru import logger
 from users.models import User
-from tg_bot.models import Survey, Report
+from tg_bot.models import Survey, Report, Issue
 from django.db.utils import IntegrityError
 
 from asgiref.sync import sync_to_async
@@ -65,7 +64,8 @@ def get_report(report_id):
 def get_survey(**data):
     def serialize(survey):
         user = User.objects.get(survey=survey)
-        serialized_survey = dict(id=survey.id, user=''.join(('@', survey.user.username)), stack=survey.stack, birth_date=survey.birth_date,
+        serialized_survey = dict(id=survey.id, user=''.join(('@', survey.user.username)), stack=survey.stack,
+                                 birth_date=survey.birth_date,
                                  specialization=survey.specialization, hobby=survey.hobby, region=survey.region,
                                  acquaintance_goal=survey.acquaintance_goal, first_name=user.first_name,
                                  last_name=user.last_name)
@@ -98,3 +98,34 @@ def get_surveys():
         return serialized_surveys
     else:
         return False
+
+
+@sync_to_async
+def is_user(tg_id):
+    try:
+        User.objects.get(tg_id=tg_id)
+        return True
+    except User.DoesNotExist:
+        return False
+
+
+@sync_to_async
+def send_message(**data):
+    from_whom = User.objects.get(username=data['from_whom_username'])
+    report = Report.objects.get(id=data['report_id'])
+    chat_id = User.objects.get(reports=report).tg_id
+    message = data['message']
+    issue = Issue.objects.update_or_create(report=report, from_whom=from_whom, defaults={'question': message})
+    issue_id = issue[0].id
+    return chat_id, issue_id
+
+
+@sync_to_async
+def send_answer(**data):
+    issue = Issue.objects.get(id=data['issue_id'])
+    from_whom = issue.from_whom
+    chat_id = from_whom.tg_id
+    message = data['message']
+    issue.answer = message
+    issue.save()
+    return chat_id

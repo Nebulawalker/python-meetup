@@ -13,11 +13,11 @@ from tg_bot.utils.db_cruds import create_survey, create_user, get_survey
 @dp.message_handler(Command('survey'), state=[UserState, SurveyState, None])
 async def form(message: types.Message):
     username = message.from_user.username
-    tg_id = message.from_user.id
     survey = await get_survey(username=username)
     if survey:
         await message.answer(
-            f'Ваша анкета зарегистрирована:\nпользователь: {survey["user"]}\nимя: {survey["first_name"]}\nфамилия: {survey["last_name"]}\nдата рождения: {survey["birth_date"]}\n'
+            f'Ваша анкета зарегистрирована:\nпользователь: {survey["user"]}\nимя: {survey["first_name"]}\nфамилия: '
+            f'{survey["last_name"]}\nдата рождения: {survey["birth_date"]}\n'
             f'специальность: {survey["specialization"]}\nстек: {survey["stack"]}\nхобби: {survey["hobby"]}\n'
             f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}',
             reply_markup=inline_kb.base_menu)
@@ -27,16 +27,15 @@ async def form(message: types.Message):
         await SurveyState.first_name.set()
 
 
-
 @dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.first_name)
 async def specialization(message: types.Message, state: FSMContext):
     first_name = message.text
     await state.update_data(first_name=first_name)
     await message.answer('Введите Вашу фамилию:')
-    await SurveyState.last_name .set()
+    await SurveyState.last_name.set()
 
 
-@dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.last_name )
+@dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.last_name)
 async def specialization(message: types.Message, state: FSMContext):
     last_name = message.text
     await state.update_data(last_name=last_name)
@@ -44,8 +43,7 @@ async def specialization(message: types.Message, state: FSMContext):
     await SurveyState.specialization.set()
 
 
-
-@dp.message_handler(lambda msg: msg.text  not in ['exit', '/start'], state=SurveyState.specialization)
+@dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.specialization)
 async def specialization(message: types.Message, state: FSMContext):
     specialization = message.text
     await state.update_data(specialization=specialization)
@@ -61,7 +59,7 @@ async def stack(message: types.Message, state: FSMContext):
     await SurveyState.hobby.set()
 
 
-@dp.message_handler(lambda msg: msg.text  not in ['exit', '/start'], state=SurveyState.hobby)
+@dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.hobby)
 async def hobby(message: types.Message, state: FSMContext):
     hobby = message.text
     await state.update_data(hobby=hobby)
@@ -69,7 +67,7 @@ async def hobby(message: types.Message, state: FSMContext):
     await SurveyState.goal.set()
 
 
-@dp.message_handler(lambda msg: msg.text  not in ['exit', '/start'], state=SurveyState.goal)
+@dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.goal)
 async def goal(message: types.Message, state: FSMContext):
     acquaintance_goal = message.text
     await state.update_data(acquaintance_goal=acquaintance_goal)
@@ -84,6 +82,7 @@ async def region(message: types.Message, state: FSMContext):
     await message.answer('Введите дату рождения в формате "гггг-мм-дд')
     await SurveyState.birthdate.set()
 
+
 @dp.message_handler(lambda msg: msg.text not in ['exit', '/start'], state=SurveyState.birthdate)
 async def proceed_data_for_survey(message: types.Message, state: FSMContext):
     try:
@@ -94,13 +93,14 @@ async def proceed_data_for_survey(message: types.Message, state: FSMContext):
     username = message.from_user.username
     tg_id = message.from_user.id
     survey_data = await state.get_data()
-    await create_user(username=username, tg_id=tg_id, first_name=survey_data['first_name'], last_name=survey_data['last_name'])
+    await create_user(username=username, tg_id=tg_id, first_name=survey_data['first_name'],
+                      last_name=survey_data['last_name'])
     await create_survey(username, **survey_data)
     survey = await get_survey(username=message.from_user.username)
     if survey:
-        await message.answer(f'Ваша анкета зарегистрирована:\nпользователь: {survey["user"]}\nимя: {survey["first_name"]}\nфамилия: {survey["last_name"]}\nдата рождения: {survey["birth_date"]}\n'
-                f'специальность: {survey["specialization"]}\nстек: {survey["stack"]}\nхобби: {survey["hobby"]}\n'
-                f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}', reply_markup=inline_kb.base_menu)
+        await message.answer(
+            f'Ваша анкета зарегистрирована:\nпользователь: {survey["user"]}\nимя: {survey["first_name"]}\nфамилия: {survey["last_name"]}\nдата рождения: {survey["birth_date"]}\n'
+            f'специальность: {survey["specialization"]}\nстек: {survey["stack"]}\nхобби: {survey["hobby"]}\n'
+            f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}',
+            reply_markup=inline_kb.base_menu)
         await state.finish()
-
-
