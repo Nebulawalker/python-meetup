@@ -26,7 +26,6 @@ async def show_reports(callback_query: types.CallbackQuery):
         await UserState.report.set()
     else:
         await callback_query.message.answer(
-            'На данный момент докладов нет',
-            reply_markup=inline_kb.base_menu
+            'На данный момент докладов нет'
         )
     await callback_query.answer()

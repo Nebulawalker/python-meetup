@@ -17,8 +17,7 @@ async def manage_report(callback_query: types.CallbackQuery, state: FSMContext):
     report_id = int(callback_query.data[1:])
     report = await get_report(report_id)
     await callback_query.message.answer(
-            await get_report_description(report),
-            reply_markup=inline_kb.base_menu)
+            await get_report_description(report))
     await state.finish()
     if report['is_current']:
 

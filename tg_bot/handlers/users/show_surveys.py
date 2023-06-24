@@ -24,8 +24,7 @@ async def show_surveys(cb: types.CallbackQuery):
         await UserState.survey.set()
     else:
         await cb.message.answer(
-            'На данный момент анкет нет',
-            reply_markup=inline_kb.base_menu
+            'На данный момент анкет нет'
         )
     await cb.answer()
 
@@ -38,7 +37,6 @@ async def manage_survey(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.answer(
         f'Анкета которую Вы запросили:\nпользователь: {survey["user"]}\nимя: {survey["first_name"]}\nфамилия: {survey["last_name"]}\nдата рождения: {survey["birth_date"]}\n'
         f'специальность: {survey["specialization"]}\nстек: {survey["stack"]}\nхобби: {survey["hobby"]}\n'
-        f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}',
-        reply_markup=inline_kb.base_menu)
+        f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}')
     await state.finish()
     await callback_query.answer()
