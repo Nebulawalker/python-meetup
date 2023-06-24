@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from loader import dp
 
-from tg_bot.states.states import UserState
+from tg_bot.states.states import UserState, MessageState
 from tg_bot.utils.db_cruds import get_report
 from tg_bot.keyboards import inline_kb
 from tg_bot.messages.messages import get_report_description
@@ -19,10 +19,11 @@ async def manage_report(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.answer(
             await get_report_description(report),
             reply_markup=inline_kb.base_menu)
-    if report['is_current']:
-        await callback_query.message.answer('Прямо сейчас идет доклад, Вы можете задать вопрос спикеру!')
-        
-   
     await state.finish()
+    if report['is_current']:
+
+        await state.update_data(report_id=report['id'])
+        await callback_query.message.answer('Прямо сейчас идет доклад, Вы можете задать вопрос спикеру!',
+                                            reply_markup=inline_kb.question_menu)
+
     await callback_query.answer()
-    
