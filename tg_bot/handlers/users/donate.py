@@ -47,7 +47,7 @@ async def handle_amount_selection(
         prices = [
             types.LabeledPrice(label='Донат', amount=amount),
         ]
-        await DonateStates.next()
+        await DonateStates.pre_checkout_query.set()
         await callback_query.bot.send_invoice(
             message.chat.id,
             title='Донат в пользу "Python meetup"',
@@ -79,7 +79,7 @@ async def checkout(
         ok=True,
         error_message="Ошибка! Повторите попытку платежа позже"
     )
-    await DonateStates.next()
+    await DonateStates.successful_payment.set()
 
 
 @dp.message_handler(
