@@ -25,6 +25,6 @@ class MessageState(StatesGroup):
 
 class DonateStates(StatesGroup):
     amount_selection = State()
-    # amount_input = State()
+    amount_input = State()
     pre_checkout_query = State()
     successful_payment = State()

@@ -5,6 +5,7 @@ base_menu_buttons = [
     types.InlineKeyboardButton('Начать', callback_data='start'),
     types.InlineKeyboardButton('Анкеты', callback_data='members'),
     types.InlineKeyboardButton('Доклады', callback_data='reports'),
+    types.InlineKeyboardButton('Отправить донат', callback_data='donate'),
 ]
 base_menu.add(*base_menu_buttons)
 
