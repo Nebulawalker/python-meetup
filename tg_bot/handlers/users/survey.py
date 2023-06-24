@@ -8,6 +8,7 @@ from datetime import date
 
 from tg_bot.states.states import UserState, SurveyState
 from tg_bot.utils.db_cruds import create_survey, create_user, get_survey
+from tg_bot.messages.messages import START_SURVEY_MSG
 
 
 @dp.message_handler(Command('survey'), state=[UserState, SurveyState, None])
@@ -21,6 +22,7 @@ async def form(message: types.Message):
             f'специальность: {survey["specialization"]}\nстек: {survey["stack"]}\nхобби: {survey["hobby"]}\n'
             f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}')
     else:
+        await message.answer(START_SURVEY_MSG)
         await message.answer(
             f'Введите Ваше имя:')
         await SurveyState.first_name.set()
