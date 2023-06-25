@@ -1,8 +1,9 @@
-from users.models import User
-from tg_bot.models import Survey, Report, Issue
+from asgiref.sync import sync_to_async
+from django.contrib.auth import get_user_model
 from django.db.utils import IntegrityError
 
-from asgiref.sync import sync_to_async
+from tg_bot.models import Issue, Report, Survey, Donation
+from users.models import User
 
 
 @sync_to_async
@@ -115,7 +116,8 @@ def send_message(**data):
     report = Report.objects.get(id=data['report_id'])
     chat_id = User.objects.get(reports=report).tg_id
     message = data['message']
-    issue = Issue.objects.update_or_create(report=report, from_whom=from_whom, defaults={'question': message})
+    issue = Issue.objects.update_or_create(
+        report=report, from_whom=from_whom, defaults={'question': message})
     issue_id = issue[0].id
     return chat_id, issue_id
 
@@ -129,3 +131,21 @@ def send_answer(**data):
     issue.answer = message
     issue.save()
     return chat_id
+
+
+async def save_donation(tg_id: int, username: str, amount: int):
+    user_model = get_user_model()
+    user = None
+    users = user_model.objects.filter(username=username)
+    if await users.aexists():
+        user = await users.afirst()
+
+    if not user:
+        users = user_model.objects.filter(tg_id=tg_id)
+        if await users.aexists():
+            user = await users.afirst()
+
+    if not user:
+        user = await user_model.objects.acreate(username=username, tg_id=tg_id)
+
+    await Donation.objects.acreate(user=user, amount=amount)
