@@ -181,3 +181,31 @@ class Survey(models.Model):
 
     def __str__(self):
         return f'Анкета {self.user}: {self.specialization}'
+
+
+class Donation(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name='пользователь',
+        on_delete=models.PROTECT,
+        related_name='donations',
+    )
+
+    amount = models.DecimalField(
+        verbose_name='сумма',
+        max_digits=19,
+        decimal_places=2,
+    )
+
+    created_at = models.DateTimeField(
+        verbose_name='создана в',
+        auto_now_add=True,
+        db_index=True,
+    )
+
+    class Meta:
+        verbose_name = 'донат'
+        verbose_name_plural = 'донаты'
+
+    def __str__(self):
+        return f'Донат {self.id} на сумму {self.amount}'

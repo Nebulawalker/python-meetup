@@ -7,6 +7,7 @@ from django.conf import settings
 from loader import dp
 from tg_bot.keyboards.inline_kb import get_donate_reply_markup
 from tg_bot.states.states import DonateStates
+from tg_bot.utils.db_cruds import save_donation
 
 
 @dp.message_handler(commands='donate', state='*')
@@ -129,9 +130,10 @@ async def checkout(pre_checkout_query: types.PreCheckoutQuery):
     state=DonateStates.successful_payment,
 )
 async def got_payment(message: types.Message, state: FSMContext):
+    amount = int(message.successful_payment.total_amount / 100)
     message_text = (
         'Прошла оплата за донат: '
-        f'<i>{int(message.successful_payment.total_amount / 100)}'
+        f'<i>{amount}'
         f' {message.successful_payment.currency}</i>.\n'
         '<b>Спасибо!</b>'
         '\nИспользуйте команду /donate чтобы отправить еще.'
@@ -141,3 +143,8 @@ async def got_payment(message: types.Message, state: FSMContext):
         parse_mode='HTML'
     )
     await state.finish()
+    await save_donation(
+        tg_id=message.chat.id,
+        username=message.chat.username,
+        amount=amount,
+    )

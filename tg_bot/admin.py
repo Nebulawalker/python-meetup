@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Report, Issue, ChatState, Survey
+from .models import Report, Issue, ChatState, Survey, Donation
 
 
 @admin.register(Report)
@@ -55,3 +55,14 @@ class SurveyAdmin(admin.ModelAdmin):
     ]
     readonly_fields = ['created_at', 'modified_at']
     ordering = ['-modified_at']
+
+
+@admin.register(Donation)
+class DonationAdmin(admin.ModelAdmin):
+    list_display = [
+        'user',
+        'amount',
+        'created_at',
+    ]
+    readonly_fields = ['created_at', 'id']
+    ordering = ['-created_at']
