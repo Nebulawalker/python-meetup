@@ -9,8 +9,12 @@ from users.models import User
 @sync_to_async
 def create_user(**data):
     try:
-        User.objects.create_user(username=data['username'], tg_id=data['tg_id'], first_name=data['first_name'],
-                                 last_name=data['last_name'])
+        User.objects.create_user(
+            username=data['username'],
+            tg_id=data['tg_id'],
+            first_name=data['first_name'],
+            last_name=data['last_name']
+        )
     except IntegrityError:
         pass
     user = User.objects.get(username=data['username'])
@@ -24,9 +28,15 @@ def create_user(**data):
 def create_survey(username, **data):
     try:
         user = User.objects.get(username=username)
-        Survey.objects.create(user=user, birth_date=data['birth_date'], specialization=data['specialization'],
-                              stack=data['stack'], hobby=data['hobby'], acquaintance_goal=data['acquaintance_goal'],
-                              region=data['region'])
+        Survey.objects.create(
+            user=user,
+            birth_date=data['birth_date'],
+            specialization=data['specialization'],
+            stack=data['stack'],
+            hobby=data['hobby'],
+            acquaintance_goal=data['acquaintance_goal'],
+            region=data['region']
+            )
     except KeyError:
         pass
 
@@ -47,8 +57,14 @@ def get_reports():
     reports = Report.objects.all().order_by('ends_at')
     serialized_reports = []
     for report in reports:
-        serialized_report = dict(id=report.id, topic=report.topic, speaker=report.speaker, starts_at=report.starts_at,
-                                 ends_at=report.ends_at, is_current=report.is_current)
+        serialized_report = dict(
+            id=report.id,
+            topic=report.topic,
+            speaker=report.speaker,
+            starts_at=report.starts_at,
+            ends_at=report.ends_at,
+            is_current=report.is_current
+        )
         serialized_reports.append(serialized_report)
     return serialized_reports
 
@@ -56,8 +72,14 @@ def get_reports():
 @sync_to_async
 def get_report(report_id):
     report = Report.objects.get(id=report_id)
-    serialized_report = dict(id=report.id, topic=report.topic, speaker=report.speaker, starts_at=report.starts_at,
-                             ends_at=report.ends_at, is_current=report.is_current)
+    serialized_report = dict(
+        id=report.id,
+        topic=report.topic,
+        speaker=report.speaker,
+        starts_at=report.starts_at,
+        ends_at=report.ends_at,
+        is_current=report.is_current
+    )
     return serialized_report
 
 
@@ -65,11 +87,18 @@ def get_report(report_id):
 def get_survey(**data):
     def serialize(survey):
         user = User.objects.get(survey=survey)
-        serialized_survey = dict(id=survey.id, user=''.join(('@', survey.user.username)), stack=survey.stack,
-                                 birth_date=survey.birth_date,
-                                 specialization=survey.specialization, hobby=survey.hobby, region=survey.region,
-                                 acquaintance_goal=survey.acquaintance_goal, first_name=user.first_name,
-                                 last_name=user.last_name)
+        serialized_survey = dict(
+            id=survey.id,
+            user=''.join(('@', survey.user.username)),
+            stack=survey.stack,
+            birth_date=survey.birth_date,
+            specialization=survey.specialization,
+            hobby=survey.hobby,
+            region=survey.region,
+            acquaintance_goal=survey.acquaintance_goal,
+            first_name=user.first_name,
+            last_name=user.last_name
+        )
         return serialized_survey
 
     if data.get('survey_id'):
@@ -92,9 +121,16 @@ def get_surveys():
     serialized_surveys = []
     if surveys:
         for survey in surveys:
-            serialized_survey = dict(id=survey.id, user=survey.user, stack=survey.stack, birth_date=survey.birth_date,
-                                     specialization=survey.specialization, hobby=survey.hobby, region=survey.region,
-                                     acquaintance_goal=survey.acquaintance_goal)
+            serialized_survey = dict(
+                id=survey.id,
+                user=survey.user,
+                stack=survey.stack,
+                birth_date=survey.birth_date,
+                specialization=survey.specialization,
+                hobby=survey.hobby,
+                region=survey.region,
+                acquaintance_goal=survey.acquaintance_goal
+            )
             serialized_surveys.append(serialized_survey)
         return serialized_surveys
     else:
@@ -149,3 +185,11 @@ async def save_donation(tg_id: int, username: str, amount: int):
         user = await user_model.objects.acreate(username=username, tg_id=tg_id)
 
     await Donation.objects.acreate(user=user, amount=amount)
+
+
+@sync_to_async
+def get_broadcast_list():
+    users = User.objects.all()
+    print(users)
+    broadcast_list = [user.tg_id for user in users if user.tg_id]
+    return broadcast_list

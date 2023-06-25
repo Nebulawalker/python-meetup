@@ -1,13 +1,15 @@
 from aiogram import types
 from aiogram.dispatcher.filters import Text
 from loader import dp
-from tg_bot.keyboards import inline_kb
+
 from tg_bot.states.states import UserState, SurveyState
 from tg_bot.utils.db_cruds import get_reports
 from tg_bot.messages.messages import get_report_button_caption
 
 
-@dp.callback_query_handler(Text('reports'), state=[UserState, SurveyState, None])
+@dp.callback_query_handler(
+        Text('reports'), state=[UserState, SurveyState, None]
+)
 async def button_show_reports(callback_query: types.CallbackQuery):
     await callback_query.message.edit_reply_markup()
     reports = await get_reports()

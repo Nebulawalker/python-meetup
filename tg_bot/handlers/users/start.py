@@ -15,7 +15,9 @@ async def intro(message: types.Message):
 
 
 @dp.message_handler(commands='start', state='*')
-async def start_conversation(message: types.Message, state: FSMContext):
+async def start_conversation_command(
+    message: types.Message, state: FSMContext
+):
     await message.answer(
         f'Здравствуйте {message.from_user.username}! Приветствуем Вас на мероприятии python-meetup!\n'
         f'Я - Бот-помощник! Могу предоставить информации о нашем мероприятии, помогу задать вопросы спикерам, '
