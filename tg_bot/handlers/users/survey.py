@@ -8,6 +8,7 @@ from datetime import date
 
 from tg_bot.states.states import UserState, SurveyState
 from tg_bot.utils.db_cruds import create_survey, create_user, get_survey
+from tg_bot.messages.messages import START_SURVEY_MSG
 
 
 @dp.message_handler(Command('survey'), state=[UserState, SurveyState, None])
@@ -19,9 +20,9 @@ async def form(message: types.Message):
             f'Ваша анкета зарегистрирована:\nпользователь: {survey["user"]}\nимя: {survey["first_name"]}\nфамилия: '
             f'{survey["last_name"]}\nдата рождения: {survey["birth_date"]}\n'
             f'специальность: {survey["specialization"]}\nстек: {survey["stack"]}\nхобби: {survey["hobby"]}\n'
-            f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}',
-            reply_markup=inline_kb.base_menu)
+            f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}')
     else:
+        await message.answer(START_SURVEY_MSG)
         await message.answer(
             f'Введите Ваше имя:')
         await SurveyState.first_name.set()
@@ -101,6 +102,5 @@ async def proceed_data_for_survey(message: types.Message, state: FSMContext):
         await message.answer(
             f'Ваша анкета зарегистрирована:\nпользователь: {survey["user"]}\nимя: {survey["first_name"]}\nфамилия: {survey["last_name"]}\nдата рождения: {survey["birth_date"]}\n'
             f'специальность: {survey["specialization"]}\nстек: {survey["stack"]}\nхобби: {survey["hobby"]}\n'
-            f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}',
-            reply_markup=inline_kb.base_menu)
+            f'цель знакомства: {survey["acquaintance_goal"]}\nрегион: {survey["region"]}')
         await state.finish()

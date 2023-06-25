@@ -15,13 +15,13 @@ async def question(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.edit_reply_markup()
     being_user = await is_user(callback_query.from_user.id)
     if being_user:
-        await callback_query.message.answer('Задайте вопрос', reply_markup=inline_kb.base_menu)
+        await callback_query.message.answer('Задайте вопрос')
         data = await state.get_data()
         report_id = data['report_id']
         print(report_id)
         await MessageState.question.set()
     else:
-        await callback_query.message.answer('Вначале заполните анкету', reply_markup=inline_kb.base_menu)
+        await callback_query.message.answer('Вначале заполните анкету')
         await state.finish()
 
 
@@ -44,7 +44,7 @@ async def answer(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.edit_reply_markup()
     username = callback_query.message.text.split(':')[0].split()[-1]
     await state.update_data(username=username)
-    await callback_query.message.answer('Ответьте на вопрос', reply_markup=inline_kb.base_menu)
+    await callback_query.message.answer('Ответьте на вопрос')
     await MessageState.answer.set()
 
 
@@ -56,6 +56,6 @@ async def proceed_answer(message: types.Message, state: FSMContext):
     print(issue_id)
     chat_id = await send_answer(message=message.text, issue_id=issue_id)
     print('chat id:=====', chat_id)
-    await bot.send_message(chat_id, message.text, reply_markup=inline_kb.base_menu)
-    await message.answer('Благодарим за ответ', reply_markup=inline_kb.base_menu)
+    await bot.send_message(chat_id, message.text)
+    await message.answer('Благодарим за ответ')
     await state.finish()
