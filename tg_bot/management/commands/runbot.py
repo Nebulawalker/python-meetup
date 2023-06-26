@@ -4,10 +4,9 @@ from aiogram import executor
 
 from loader import dp
 
-from tg_bot.handlers import *
+import asyncio
 
-from tg_bot.utils.notify_admins import on_startup_notify
-from tg_bot.utils.set_bot_commands import set_default_commands
+from tg_bot.handlers.users.broadcaster import sentinel
 
 from loguru import logger
 
@@ -18,9 +17,9 @@ logger.add(
     rotation='1 week'
 )
 
+
 async def on_startup(dispatcher):
-    await set_default_commands(dispatcher)
-    await on_startup_notify(dispatcher)
+    asyncio.create_task(sentinel())
     logger.info('Бот запущен')
 
 

@@ -21,7 +21,7 @@ async def start_conversation_command(
     await message.answer(
         f'Здравствуйте {message.from_user.username}! Приветствуем Вас на мероприятии python-meetup!\n'
         f'Я - Бот-помощник! Могу предоставить информации о нашем мероприятии, помогу задать вопросы спикерам, '
-        f'познакомить с другими участниками!',
+        f'познакомить с другими участниками! Для выхода, в любой момент наберите exit',
         reply_markup=inline_kb.base_menu)
     await state.finish()
 
@@ -32,7 +32,7 @@ async def button_start(callback_query: types.CallbackQuery, state: FSMContext):
     await callback_query.message.answer(
         f'Здравствуйте {callback_query.from_user.username}! Приветствуем Вас на мероприятии python-meetup!\n'
         f'Я - Бот-помощник! Могу предоставить информации о нашем мероприятии, помогу задать вопросы спикерам, '
-        f'познакомить с другими участниками!',
+        f'познакомить с другими участниками! Для выхода, в любой момент наберите exit',
         reply_markup=inline_kb.base_menu)
     await state.finish()
 

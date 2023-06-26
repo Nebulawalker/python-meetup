@@ -2,7 +2,7 @@ from asgiref.sync import sync_to_async
 from django.contrib.auth import get_user_model
 from django.db.utils import IntegrityError
 
-from tg_bot.models import Issue, Report, Survey, Donation
+from tg_bot.models import Issue, Report, Survey, Donation, Watcher, Count
 from users.models import User
 
 
@@ -36,7 +36,7 @@ def create_survey(username, **data):
             hobby=data['hobby'],
             acquaintance_goal=data['acquaintance_goal'],
             region=data['region']
-            )
+        )
     except KeyError:
         pass
 
@@ -193,3 +193,28 @@ def get_broadcast_list():
     print(users)
     broadcast_list = [user.tg_id for user in users if user.tg_id]
     return broadcast_list
+
+
+@sync_to_async
+def get_watcher():
+    number_watchers = len(Watcher.objects.all())
+    control_number = Count.objects.last().current_number
+    if number_watchers == control_number:
+        return False
+    else:
+        report = Watcher.objects.last().report
+        topic = report.topic
+        speaker = report.speaker
+        is_current = report.is_current
+        if is_current:
+            status = 'начался'
+        else:
+            status = 'закончился'
+        return topic, speaker, status
+
+
+@sync_to_async
+def change_count():
+    count = Count.objects.last()
+    count.current_number += 1
+    count.save()
