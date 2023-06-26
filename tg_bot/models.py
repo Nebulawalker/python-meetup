@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.timezone import now, localtime
 from django.dispatch import receiver
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save
 
 
 class Report(models.Model):
@@ -185,9 +185,9 @@ class Donation(models.Model):
 class Watcher(models.Model):
     report = models.ForeignKey(
         Report,
-        verbose_name='доклад',
-        on_delete=models.PROTECT,
+        verbose_name='доклад', on_delete=models.SET_NULL,
         related_name='watcher',
+        null=True
     )
 
 
@@ -195,13 +195,14 @@ class Count(models.Model):
     current_number = models.IntegerField('число', null=True, default=0)
 
 
-@receiver(pre_save, sender=Report)
-def report_change_status(sender, instance, **kwargs):
-    report = instance
-    watcher = Watcher.objects.all()
-    count = Count.objects.last()
-    if watcher:
-        watcher[0].delete()
-        count.current_number -= 1
-        count.save()
-    Watcher.objects.create(report=report)
+@receiver(post_save, sender=Report)
+def report_change_status(sender, created, instance, **kwargs):
+    if not created:
+        report = instance
+        watcher = Watcher.objects.all()
+        count = Count.objects.last()
+        if watcher:
+            watcher[0].delete()
+            count.current_number -= 1
+            count.save()
+        Watcher.objects.create(report=report)
