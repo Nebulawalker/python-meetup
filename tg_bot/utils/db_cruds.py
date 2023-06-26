@@ -198,7 +198,10 @@ def get_broadcast_list():
 @sync_to_async
 def get_watcher():
     number_watchers = len(Watcher.objects.all())
-    control_number = Count.objects.last().current_number
+    try:
+        control_number = Count.objects.last().current_number
+    except AttributeError:
+        control_number=Count.objects.create(current_number=0).current_number
     if number_watchers == control_number:
         return False
     else:

@@ -192,7 +192,7 @@ class Watcher(models.Model):
 
 
 class Count(models.Model):
-    current_number = models.IntegerField('число', null=True, blank=True)
+    current_number = models.IntegerField('число', null=True, default=0)
 
 
 @receiver(pre_save, sender=Report)
